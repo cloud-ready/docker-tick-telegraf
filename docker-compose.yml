@@ -1,0 +1,37 @@
+version: '2.1'
+services:
+  tick-telegraf:
+    container_name: ${CONTAINER_HOST_NAME:-standalone.tick}-telegraf
+    hostname: ${CONTAINER_HOST_NAME:-standalone.tick}-telegraf
+    image: ${IMAGE_NAME:-telegraf}:${IMAGE_TAG:-1.8.3}
+    environment:
+      HOST_PROC: /host/proc
+      OUTPUTS_INFLUXDB_URLS_0: ${OUTPUTS_INFLUXDB_URLS_0:-http://standalone.tick-influxdb:8086}
+      OUTPUTS_INFLUXDB_DATABASE: telegraf
+      INFLUXDB_USERNAME: telegraf
+      INFLUXDB_PASSWORD: telegraf
+    networks:
+      local-network:
+        ipv4_address: 172.16.238.80
+        #ipv6_address: 2001:3984:3989::80
+    ports:
+    - "${EXTERNAL_TELEGRAF_STATSD_PORT:-8125}:${TELEGRAF_STATSD_PORT:-8125}"
+    - "${EXTERNAL_TELEGRAF_UDP_PORT:-8092}:${TELEGRAF_UDP_PORT:-8092}"
+    - "${EXTERNAL_TELEGRAF_TCP_PORT:-8094}:${TELEGRAF_TCP_PORT:-8094}"
+    restart: always
+    volumes:
+    - /proc:/host/proc:ro # Monitoring the host filesystem
+    - /var/run/docker.sock:/var/run/docker.sock
+    - ${TELEGRAF_CONFIG:-./data/etc/telegraf/telegraf.conf}:/etc/telegraf/telegraf.conf:ro
+
+
+networks:
+  local-network:
+    external: true
+    driver: bridge
+    enable_ipv6: true
+    ipam:
+      driver: default
+      config:
+      - subnet: 172.16.238.0/24
+      #- subnet: 2001:3984:3989::/64
