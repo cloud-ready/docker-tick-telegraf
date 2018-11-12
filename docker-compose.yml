@@ -2,22 +2,30 @@ version: '2.1'
 services:
   tick-telegraf:
     container_name: ${CONTAINER_HOST_NAME:-standalone.tick}-telegraf
-    hostname: ${CONTAINER_HOST_NAME:-standalone.tick}-telegraf
-    image: ${IMAGE_NAME:-telegraf}:${IMAGE_TAG:-1.8.3}
     environment:
       HOST_PROC: /host/proc
       OUTPUTS_INFLUXDB_URLS_0: ${OUTPUTS_INFLUXDB_URLS_0:-http://standalone.tick-influxdb:8086}
-      OUTPUTS_INFLUXDB_DATABASE: telegraf
-      INFLUXDB_USERNAME: telegraf
-      INFLUXDB_PASSWORD: telegraf
+      OUTPUTS_INFLUXDB_DATABASE: ${OUTPUTS_INFLUXDB_DATABASE:-telegraf}
+      INFLUXDB_USERNAME: ${INFLUXDB_USERNAME:-telegraf}
+      INFLUXDB_PASSWORD: ${INFLUXDB_PASSWORD:-telegraf}
+    hostname: ${CONTAINER_HOST_NAME:-standalone.tick}-telegraf
+    image: ${IMAGE_NAME:-telegraf}:${IMAGE_TAG:-1.8.3}
+    labels:
+      deploy.config.commit: ${LABEL_DEPLOY_CONFIG_COMMIT:-unknown}
+      deploy.config.name: ${LABEL_DEPLOY_CONFIG_NAME:-unknown}
+      deploy.config.ref: ${LABEL_DEPLOY_CONFIG_REF:-unknown}
+      deploy.util.commit: ${LABEL_DEPLOY_UTIL_COMMIT:-unknown}
+      deploy.util.ref: ${LABEL_DEPLOY_UTIL_REF:-unknown}
+      instance.name.short: ${LABEL_INSTANCE_NAME_SHORT:-standalone.tick-telegraf}
+      instance.name: ${LABEL_INSTANCE_NAME:-127.0.0.1/tick-telegraf/standalone}
     networks:
       local-network:
-        ipv4_address: 172.16.238.80
-        #ipv6_address: 2001:3984:3989::80
+        ipv4_address: ${IPV4_ADDRESS:-172.16.238.80}
+        #ipv6_address: ${IPV6_ADDRESS:-2001:3984:3989::80}
     ports:
-    - "${EXTERNAL_TELEGRAF_STATSD_PORT:-8125}:${TELEGRAF_STATSD_PORT:-8125}"
-    - "${EXTERNAL_TELEGRAF_UDP_PORT:-8092}:${TELEGRAF_UDP_PORT:-8092}"
-    - "${EXTERNAL_TELEGRAF_TCP_PORT:-8094}:${TELEGRAF_TCP_PORT:-8094}"
+    - "${EXTERNAL_TELEGRAF_STATSD_8125_PORT:-8125}:8125"
+    - "${EXTERNAL_TELEGRAF_UDP_8092_PORT:-8092}:8092/udp"
+    - "${EXTERNAL_TELEGRAF_TCP_8094_PORT:-8094}:8094"
     restart: always
     volumes:
     - /proc:/host/proc:ro # Monitoring the host filesystem
