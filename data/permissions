@@ -1,0 +1,4 @@
+
+d etc/telegraf               1000:1000 777
+
+f etc/telegraf/telegraf.conf 1000:1000 777

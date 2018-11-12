@@ -3,7 +3,7 @@ services:
   tick-telegraf:
     container_name: ${CONTAINER_HOST_NAME:-standalone.tick}-telegraf
     environment:
-      HOST_PROC: /host/proc
+      HOST_PROC: ${HOST_PROC:-/host/proc}
       OUTPUTS_INFLUXDB_URLS_0: ${OUTPUTS_INFLUXDB_URLS_0:-http://standalone.tick-influxdb:8086}
       OUTPUTS_INFLUXDB_DATABASE: ${OUTPUTS_INFLUXDB_DATABASE:-telegraf}
       INFLUXDB_USERNAME: ${INFLUXDB_USERNAME:-telegraf}
